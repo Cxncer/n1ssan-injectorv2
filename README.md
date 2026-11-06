@@ -6,6 +6,10 @@ This is the standalone loader for the n1ssan toolchain. It only injects; it neve
 never touches Steam, and never unloads the DLL (the DLL owns hooks and a worker thread, so unloading
 it mid-session would crash CS2).
 
+> This repository is **n1ssan-injectorv2**. The old `n1ssan-injector` repository is historical and
+> must not be used for new work. DOMINATE launches this injector as a child process; it never copies
+> the injection code into the launcher.
+
 ## Requirements
 
 - Windows 10/11 x64
@@ -16,7 +20,7 @@ it mid-session would crash CS2).
 ## Quick start
 
 ```powershell
-# from development/n1ssan-injector
+# from the repository root
 dotnet build -c Release
 .\bin\Release\net8.0-windows\n1ssan-injector.exe
 ```
@@ -33,7 +37,8 @@ Imports: 11 DLLs / 160 functions resolved.
 MinHook: MinHook.x64.dll
 Target:  cs2.exe (PID 12345)
 Waiting for client.dll (up to 120s)...
-Game loaded; letting it settle.
+Waiting for the CS2 window...
+Game window detected. Waiting 32s more for the home screen (settle target 45s).
 Injecting n1ssan-dll.dll...
 LoadLibraryW returned success; confirming the module is listed.
 Module is loaded.
@@ -56,6 +61,7 @@ RESULT=OK pid=12345 status=injected dll="E:\...\n1ssan-dll.dll"
 | `--pid <pid>` | Target an existing process (used by the launcher, or for testing) |
 | `--wait <seconds>` | How long to wait for CS2 to start (default `300`; `0` = fail immediately) |
 | `--no-wait` | Same as `--wait 0` |
+| `--settle <seconds>` | Minimum game uptime before injecting (default `45`; `0` = inject as soon as the window exists) |
 | `--inject-timeout <sec>` | How long `LoadLibraryW` may take inside CS2 (default `60`) |
 | `--status-timeout <sec>` | How long to wait for the DLL's `READY` heartbeat (default `120`) |
 | `--no-status` | Skip the status handshake |
@@ -94,9 +100,18 @@ wastes the DLL's 30-second wait. The injector therefore:
 
 1. finds `cs2.exe` (preferring a process that already has `client.dll`, otherwise the newest one);
 2. waits until `client.dll` appears in the target's module list (120 s);
-3. waits 3 s for the game to finish initialising;
-4. injects and confirms the module is listed;
-5. waits for the DLL status record to become `READY` or `DEGRADED`.
+3. waits for the game's visible main window (90 s);
+4. waits until the game has been running for `--settle` seconds (default 45), so a freshly launched
+   game has time to leave the intro/loading screen and reach the home screen;
+5. injects and confirms the module is listed;
+6. waits for the DLL status record to become `READY` or `DEGRADED`.
+
+If the game has already been running longer than `--settle` when the injector starts, step 4 is
+skipped, so injecting into an established session is immediate.
+
+The window + uptime gate is the best signal available from outside the game; the authoritative
+"ready" check remains the DLL's own preflight and status heartbeat. If a slow machine still injects
+before the home screen is up, raise `--settle`.
 
 If the DLL is already loaded, the injector exits `0` with `status=already-loaded`.
 
@@ -151,6 +166,7 @@ optional glove-schema feature is unavailable). `FAILED` prints the reason and ex
 | Exit `7`, reason `loadout_empty` | The DLL found no loadout: it reads `n1ssan-data.json` from the `n1ssan-web-bridge` folder (or `N1SSAN_DATA_FILE`). Fill in a loadout in the web UI first. |
 | Exit `7`, reason `loadout_compatibility_failed` | A selected paint kit is not compatible with the item; see the preflight lines in `n1ssalogs.md`. |
 | Exit `8` | The DLL is running but never reached `READY`. Read `n1ssalogs.md`; scanning the live schema can take a while. |
+| Exit `4`, "CS2 window did not appear" | The game is still loading. Raise `--wait`/`--settle` or retry once the home screen is visible. |
 
 Logs always live next to the DLL as `n1ssalogs.md`.
 

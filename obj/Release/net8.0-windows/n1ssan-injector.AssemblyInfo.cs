@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("n1ssan-injector")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.0+851e30fbbd64e07aa1e99351c87ade2fa4bf1b92")]
 [assembly: System.Reflection.AssemblyProductAttribute("n1ssan-injector")]
 [assembly: System.Reflection.AssemblyTitleAttribute("n1ssan-injector")]
 [assembly: System.Reflection.AssemblyVersionAttribute("2.0.0.0")]

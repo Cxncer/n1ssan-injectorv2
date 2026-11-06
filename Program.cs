@@ -219,8 +219,33 @@ namespace n1ssan_injector
                             : $"{targetName} exited before it finished loading.");
                 }
 
-                Emit("Game loaded; letting it settle.");
-                await GameProcess.SettleAsync(ct).ConfigureAwait(false);
+                Emit("Waiting for the CS2 window...");
+
+                bool windowFound = await GameProcess
+                    .WaitForMainWindowAsync(pid, GameProcess.WindowTimeout, ct, Emit)
+                    .ConfigureAwait(false);
+
+                if (!windowFound)
+                {
+                    return Fail(ExitCodes.GameNotFound,
+                        $"The CS2 window did not appear within {GameProcess.WindowTimeout.TotalSeconds:0} seconds; " +
+                        "the game is still loading or not at the home screen.");
+                }
+
+                TimeSpan uptime = GameProcess.GetUptime(pid);
+                TimeSpan remaining = options.HomeSettle - uptime;
+
+                if (remaining > TimeSpan.Zero)
+                {
+                    Emit($"Game window detected. Waiting {remaining.TotalSeconds:0}s more for the home screen " +
+                         $"(settle target {options.HomeSettle.TotalSeconds:0}s).");
+                    await Task.Delay(remaining, ct).ConfigureAwait(false);
+                }
+                else
+                {
+                    Emit($"Game window detected; the game has been running {uptime.TotalSeconds:0}s, " +
+                         "so the home-screen settle target is already met.");
+                }
             }
 
             if (!GameProcess.IsAlive(pid))
@@ -442,6 +467,7 @@ namespace n1ssan_injector
                   --dll <path>           Inject this DLL (default: n1ssan-dll.dll found automatically)
                   --pid <pid>            Target an existing cs2.exe instead of detecting it
                   --wait <seconds>       How long to wait for CS2 to start (default 300, 0 = don't wait)
+                  --settle <seconds>     Minimum game uptime before injecting (default 45)
                   --inject-timeout <sec> How long LoadLibraryW may take inside CS2 (default 60)
                   --status-timeout <sec> How long to wait for the DLL's READY heartbeat (default 120)
                   --no-status            Skip waiting for the DLL status heartbeat
@@ -473,6 +499,7 @@ namespace n1ssan_injector
             internal string? DllPath { get; private set; }
             internal uint? Pid { get; private set; }
             internal TimeSpan WaitForGame { get; private set; } = TimeSpan.FromSeconds(300);
+            internal TimeSpan HomeSettle { get; private set; } = TimeSpan.FromSeconds(45);
             internal TimeSpan InjectTimeout { get; private set; } = TimeSpan.FromSeconds(60);
             internal TimeSpan StatusTimeout { get; private set; } = TimeSpan.FromSeconds(120);
             internal bool SkipStatus { get; private set; }
@@ -517,6 +544,10 @@ namespace n1ssan_injector
 
                         case "--no-wait":
                             options.WaitForGame = TimeSpan.Zero;
+                            break;
+
+                        case "--settle":
+                            options.HomeSettle = ParseSeconds(RequireValue(args, ref i, argument), argument);
                             break;
 
                         case "--inject-timeout":

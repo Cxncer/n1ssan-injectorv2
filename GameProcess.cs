@@ -16,8 +16,8 @@ namespace n1ssan_injector
         internal const string GameExeName = "cs2.exe";
         internal const string ClientModuleName = "client.dll";
 
-        /// <summary>Time CS2 needs after client.dll is mapped before the game is usable.</summary>
-        internal static readonly TimeSpan SettleDelay = TimeSpan.FromSeconds(3);
+        /// <summary>How long the game may take to create its main window.</summary>
+        internal static readonly TimeSpan WindowTimeout = TimeSpan.FromSeconds(90);
 
         internal static uint FindProcessId(string exeName)
         {
@@ -234,9 +234,76 @@ namespace n1ssan_injector
             return false;
         }
 
-        /// <summary>Gives the game a moment to finish initialising after client.dll appears.</summary>
-        internal static async Task SettleAsync(CancellationToken ct)
-            => await Task.Delay(SettleDelay, ct).ConfigureAwait(false);
+        /// <summary>
+        /// Waits until the game has a visible top-level window. CS2 creates it during the intro,
+        /// so this is a necessary but not sufficient signal for "the home screen is up".
+        /// </summary>
+        internal static async Task<bool> WaitForMainWindowAsync(uint pid, TimeSpan timeout, CancellationToken ct, Action<string>? progress = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var nextNotice = TimeSpan.Zero;
+
+            while (stopwatch.Elapsed < timeout)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                if (!IsAlive(pid))
+                    return false;
+
+                if (TryGetMainWindow(pid, out _))
+                    return true;
+
+                if (progress != null && stopwatch.Elapsed >= nextNotice)
+                {
+                    progress($"Waiting for the CS2 window... ({stopwatch.Elapsed.TotalSeconds:0}s)");
+                    nextNotice = stopwatch.Elapsed + TimeSpan.FromSeconds(10);
+                }
+
+                await Task.Delay(500, ct).ConfigureAwait(false);
+            }
+
+            return false;
+        }
+
+        internal static bool TryGetMainWindow(uint pid, out IntPtr handle)
+        {
+            handle = IntPtr.Zero;
+
+            try
+            {
+                using var process = Process.GetProcessById((int)pid);
+                process.Refresh();
+
+                IntPtr candidate = process.MainWindowHandle;
+                if (candidate == IntPtr.Zero || !NativeMethods.IsWindowVisible(candidate))
+                    return false;
+
+                handle = candidate;
+                return true;
+            }
+            catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// How long the process has been running. Returns zero when the start time is not
+        /// readable, in which case the caller applies the full settle delay.
+        /// </summary>
+        internal static TimeSpan GetUptime(uint pid)
+        {
+            try
+            {
+                using var process = Process.GetProcessById((int)pid);
+                TimeSpan uptime = DateTime.Now - process.StartTime;
+                return uptime > TimeSpan.Zero ? uptime : TimeSpan.Zero;
+            }
+            catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception)
+            {
+                return TimeSpan.Zero;
+            }
+        }
 
         /// <summary>Wait for the injected module to show up in the target's module list.</summary>
         internal static async Task<bool> WaitForModuleAsync(uint pid, string dllFileName, string prefix, TimeSpan timeout, CancellationToken ct)

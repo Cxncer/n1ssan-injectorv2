@@ -12,3 +12,4 @@ E:\Vibe Coding\CS2 Lore\CS2 Lore\development\n1ssan-injector\obj\Release\net8.0-
 E:\Vibe Coding\CS2 Lore\CS2 Lore\development\n1ssan-injector\obj\Release\net8.0-windows\n1ssan-injector.pdb
 E:\Vibe Coding\CS2 Lore\CS2 Lore\development\n1ssan-injector\obj\Release\net8.0-windows\n1ssan-injector.genruntimeconfig.cache
 E:\Vibe Coding\CS2 Lore\CS2 Lore\development\n1ssan-injector\obj\Release\net8.0-windows\ref\n1ssan-injector.dll
+E:\Vibe Coding\CS2 Lore\CS2 Lore\development\n1ssan-injector\obj\Release\net8.0-windows\n1ssan-injector.sourcelink.json

@@ -1,0 +1,18 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test payloads and local copies
+*.status
+*.bak
+
+# Publish output
+publish/
