@@ -330,7 +330,7 @@ namespace n1ssan_injector
                     case StatusOutcome.Failed:
                         Console.Error.WriteLine("ERROR: The DLL failed during startup.");
                         Console.Error.WriteLine($"       Status: {InjectorConfig.StatusFile(pid)}");
-                        Console.Error.WriteLine($"       Log:    {Path.Combine(dllDirectory, "n1ssalogs.md")}");
+                        Console.Error.WriteLine($"       Log:    {Path.Combine(dllDirectory, "n1ssanlogs.md")}");
                         return Fail(ExitCodes.DllFailed, "The DLL reported FAILED.");
 
                     case StatusOutcome.ProcessExited:
@@ -339,7 +339,7 @@ namespace n1ssan_injector
                     case StatusOutcome.TimedOut:
                         Console.Error.WriteLine($"ERROR: No READY heartbeat within {options.StatusTimeout.TotalSeconds:0} seconds.");
                         Console.Error.WriteLine($"       Status: {InjectorConfig.StatusFile(pid)}");
-                        Console.Error.WriteLine($"       Log:    {Path.Combine(dllDirectory, "n1ssalogs.md")}");
+                        Console.Error.WriteLine($"       Log:    {Path.Combine(dllDirectory, "n1ssanlogs.md")}");
                         return Fail(ExitCodes.StatusTimeout, "The DLL did not report READY in time.");
                 }
             }
@@ -349,7 +349,7 @@ namespace n1ssan_injector
             if (isCs2Target && string.Equals(dllFileName, InjectorConfig.DllName, StringComparison.OrdinalIgnoreCase))
             {
                 Emit("n1ssan is loaded in CS2.");
-                Emit($"Log:     {Path.Combine(dllDirectory, "n1ssalogs.md")}");
+                Emit($"Log:     {Path.Combine(dllDirectory, "n1ssanlogs.md")}");
                 Emit($"Status:  {InjectorConfig.StatusFile(pid)}");
             }
             else
