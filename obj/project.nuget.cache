@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "53HSiR2OJcM=",
+  "dgSpecHash": "sLBj/F+d5eE=",
   "success": true,
-  "projectFilePath": "E:\\Vibe Coding\\CS2 Lore\\CS2 Lore\\development\\n1ssan-injector\\n1ssan-injector.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mirac\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.16\\microsoft.netcore.app.runtime.win-x64.8.0.16.nupkg.sha512",
+    "C:\\Users\\mirac\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.16\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.16.nupkg.sha512",
+    "C:\\Users\\mirac\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.16\\microsoft.aspnetcore.app.runtime.win-x64.8.0.16.nupkg.sha512"
+  ],
   "logs": []
 }
