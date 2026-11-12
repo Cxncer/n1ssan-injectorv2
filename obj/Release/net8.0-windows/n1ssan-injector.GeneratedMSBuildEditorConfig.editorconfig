@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = n1ssan_injector
-build_property.ProjectDir = E:\Vibe Coding\CS2 Lore\CS2 Lore\development\n1ssan-injector\
+build_property.ProjectDir = E:\Vibe Coding\CS2 Lore\CS2 n1ssan 2\development\n1ssan-injectorv2\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

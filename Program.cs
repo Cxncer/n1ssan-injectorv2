@@ -34,10 +34,39 @@ namespace n1ssan_injector
 
         private static bool s_quiet;
 
+        // This is a WinExe and the launcher runs it with redirected output, so
+        // there is no console attached: setting OutputEncoding or Title throws
+        // IOException("The handle is invalid") and aborted startup before the
+        // injection ever started. Console setup must stay best effort.
+        private static void ConfigureConsole()
+        {
+            try
+            {
+                Console.OutputEncoding = Encoding.UTF8;
+            }
+            catch (IOException)
+            {
+            }
+            catch (PlatformNotSupportedException)
+            {
+            }
+
+            try
+            {
+                if (!Console.IsOutputRedirected)
+                    Console.Title = "n1ssan injector";
+            }
+            catch (IOException)
+            {
+            }
+            catch (PlatformNotSupportedException)
+            {
+            }
+        }
+
         private static async Task<int> Main(string[] args)
         {
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.Title = "n1ssan injector";
+            ConfigureConsole();
 
             Options options;
 

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj": {}
+    "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan 2\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj": {}
   },
   "projects": {
-    "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj": {
+    "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan 2\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj": {
       "version": "2.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj",
+        "projectUniqueName": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan 2\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj",
         "projectName": "n1ssan-injector",
-        "projectPath": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj",
+        "projectPath": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan 2\\development\\n1ssan-injectorv2\\n1ssan-injector.csproj",
         "packagesPath": "C:\\Users\\mirac\\.nuget\\packages\\",
-        "outputPath": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan\\development\\n1ssan-injectorv2\\obj\\",
+        "outputPath": "E:\\Vibe Coding\\CS2 Lore\\CS2 n1ssan 2\\development\\n1ssan-injectorv2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\mirac\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -55,31 +55,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[8.0.16, 8.0.16]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[8.0.16, 8.0.16]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-              "version": "[8.0.16, 8.0.16]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.410/PortableRuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win-x64": {
-          "#import": []
         }
       }
     }
