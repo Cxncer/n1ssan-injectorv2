@@ -238,6 +238,7 @@ namespace n1ssan_injector
                     Emit($"DLL state: {existing.State} ({existing.Age.TotalSeconds:0}s old)");
 
                 Console.WriteLine($"RESULT=OK pid={pid} status=already-loaded");
+                WriteOutcomeFile("OK", "already-loaded", pid);
                 return ExitCodes.Success;
             }
 
@@ -406,6 +407,7 @@ namespace n1ssan_injector
             }
 
             Console.WriteLine($"RESULT=OK pid={pid} status=injected dll=\"{resolved.Path}\"");
+            WriteOutcomeFile("OK", "injected", pid);
 
             return ExitCodes.Success;
         }
@@ -497,11 +499,61 @@ namespace n1ssan_injector
                 Console.WriteLine(message);
         }
 
-        private static int Fail(int code, string message)
+        private static int Fail(int code, string message, uint pid = 0)
         {
             Console.Error.WriteLine($"FAILED: {message}");
             Console.WriteLine($"RESULT=FAIL code={code} name={ExitCodes.Name(code)}");
+            WriteOutcomeFile(ExitCodes.Name(code), message, pid);
             return code;
+        }
+
+        // The Bridge reads this file for its consolidated diagnostics document, so
+        // the loader outcome is classified from data instead of console text.
+        private static void WriteOutcomeFile(string code, string message, uint pid)
+        {
+            try
+            {
+                string root = Environment.GetEnvironmentVariable("LOCALAPPDATA") ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(root))
+                    root = Path.GetTempPath();
+
+                string directory = Path.Combine(root, "n1ssan", "status");
+                Directory.CreateDirectory(directory);
+
+                string payload =
+                    "{\"code\":" + JsonString(code) +
+                    ",\"ok\":" + (code == "OK" ? "true" : "false") +
+                    ",\"pid\":" + pid.ToString(CultureInfo.InvariantCulture) +
+                    ",\"message\":" + JsonString(message) +
+                    ",\"atUtc\":" + JsonString(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)) +
+                    "}";
+
+                File.WriteAllText(Path.Combine(directory, "injector.json"), payload);
+            }
+            catch (Exception ex)
+            {
+                Emit("WARNING: could not record the loader outcome: " + ex.Message);
+            }
+        }
+
+        private static string JsonString(string value)
+        {
+            var builder = new StringBuilder("\"");
+
+            foreach (char c in value)
+            {
+                switch (c)
+                {
+                    case '\\': builder.Append("\\\\"); break;
+                    case '"': builder.Append("\\\""); break;
+                    case '\r': break;
+                    case '\n': builder.Append("\\n"); break;
+                    case '\t': builder.Append("\\t"); break;
+                    default: builder.Append(c); break;
+                }
+            }
+
+            return builder.Append('"').ToString();
         }
 
         private static void PrintUsage()
