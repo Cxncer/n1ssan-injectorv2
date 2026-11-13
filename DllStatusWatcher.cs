@@ -36,7 +36,8 @@ namespace n1ssan_injector
 
     /// <summary>
     /// Reads the versioned status record that n1ssan-dll.dll publishes:
-    ///   N1SSAN_STATUS|1|&lt;UTC ISO-8601&gt;|&lt;pid&gt;|&lt;build-id&gt;|&lt;state&gt;|reason=&lt;reason&gt;
+    ///   N1SSAN_STATUS|2|&lt;UTC ISO-8601&gt;|&lt;pid&gt;|&lt;build-id&gt;|&lt;state&gt;|reason=&lt;reason&gt;|code=&lt;CODE&gt;
+    ///   (protocol 1 records omit the trailing code field)
     /// A state is only trustworthy while its heartbeat is fresh (30 s), per the DLL status contract.
     /// </summary>
     internal static class DllStatusWatcher
@@ -77,13 +78,14 @@ namespace n1ssan_injector
 
             string[] fields = line.Split('|');
 
-            if (fields.Length != 7 ||
+            if ((fields.Length != 7 && fields.Length != 8) ||
                 fields[0] != Magic ||
                 fields[1] != ProtocolVersion ||
                 !uint.TryParse(fields[3], NumberStyles.None, CultureInfo.InvariantCulture, out uint reportedPid) ||
                 reportedPid != pid ||
                 !DateTimeOffset.TryParse(fields[2], CultureInfo.InvariantCulture,
                     DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out DateTimeOffset timestamp) ||
+                (fields[1] != "1" && fields[1] != "2") ||
                 !fields[6].StartsWith("reason=", StringComparison.Ordinal))
             {
                 message = "status record is malformed or belongs to another process";

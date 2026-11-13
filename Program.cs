@@ -22,6 +22,25 @@ namespace n1ssan_injector
         internal const int DllFailed = 7;
         internal const int StatusTimeout = 8;
         internal const int Cancelled = 130;
+
+        /// <summary>
+        /// The shared failure classification (failure-taxonomy.md). Emitted next to
+        /// the numeric exit code so a consumer never has to hard-code the numbers.
+        /// </summary>
+        internal static string Name(int code) => code switch
+        {
+            Success => "OK",
+            Unexpected => "E_UNEXPECTED",
+            Usage => "E_USAGE",
+            DllProblem => "E_DLL_PROBLEM",
+            GameNotFound => "E_GAME_NOT_FOUND",
+            InjectionFailed => "E_INJECTION_FAILED",
+            ModuleRejected => "E_MODULE_REJECTED",
+            DllFailed => "E_DLL_FAILED",
+            StatusTimeout => "E_STATUS_TIMEOUT",
+            Cancelled => "E_CANCELLED",
+            _ => "E_UNKNOWN",
+        };
     }
 
     internal static class Program
@@ -481,7 +500,7 @@ namespace n1ssan_injector
         private static int Fail(int code, string message)
         {
             Console.Error.WriteLine($"FAILED: {message}");
-            Console.WriteLine($"RESULT=FAIL code={code}");
+            Console.WriteLine($"RESULT=FAIL code={code} name={ExitCodes.Name(code)}");
             return code;
         }
 
